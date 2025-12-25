@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+
+<!-- 主容器 - 使用BorderPane布局 -->
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.smartfilemanager.controller.MainController"
+            stylesheets="@../css/main.css"
+            prefWidth="1200" prefHeight="800"
+            minWidth="800" minHeight="600">
+
+    <!-- 定义ToggleGroup -->
+    <fx:define>
+        <ToggleGroup fx:id="viewModeGroup"/>
+        <ToggleGroup fx:id="searchTypeGroup"/>
+    </fx:define>
+
+    <!-- ========== 顶部区域：菜单栏和工具栏 ========== -->
+    <top>
+        <VBox>
+            <!-- 菜单栏 -->
+            <MenuBar VBox.vgrow="NEVER">
+                <!-- 文件菜单 -->
+                <Menu text="文件">
+                    <MenuItem text="新建规则" onAction="#handleNewRule" accelerator="Ctrl+N">
+<!--                        <accelerator>-->
+<!--                            <KeyCodeCombination code="N" control="TRUE"/>-->
+<!--                        </accelerator>-->
+                    </MenuItem>
+                    <MenuItem text="导入规则..." onAction="#handleImportRule"/>
+                    <MenuItem text="导出规则..." onAction="#handleExportRule"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="设置" onAction="#handleOpenSettings">
+<!--                        <accelerator>-->
+<!--                            <KeyCodeCombination code="COMMA" control="UP"/>-->
+<!--                        </accelerator>-->
+                    </MenuItem>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="退出" onAction="#handleExit">
+<!--                        <accelerator>-->
+<!--                            <KeyCodeCombination code="Q" control="UP"/>-->
+<!--                        </accelerator>-->
+                    </MenuItem>
+                </Menu>
+
+                <!-- 监控菜单 -->
+                <Menu text="监控">
+                    <MenuItem text="开始监控" onAction="#handleStartMonitoring">
+<!--                        <accelerator>-->
+<!--                            <KeyCodeCombination code="F5"/>-->
+<!--                        </accelerator>-->
+                    </MenuItem>
+                    <MenuItem text="停止监控" onAction="#handleStopMonitoring"/>
+                    <MenuItem text="添加监控文件夹..." onAction="#handleAddMonitorFolder"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="手动整理" onAction="#handleManualOrganize"/>
+                </Menu>
+
+                <!-- 工具菜单 -->
+                <Menu text="工具">
+                    <MenuItem text="智能重命名" onAction="#handleSmartRename"/>
+                    <MenuItem text="批量标签管理" onAction="#handleBatchTag"/>
+                    <MenuItem text="查找重复文件" onAction="#handleFindDuplicates"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="清理缓存" onAction="#handleClearCache"/>
+                    <MenuItem text="查看存储分析" onAction="#handleStorageAnalysis"/>
+                </Menu>
+
+                <!-- 视图菜单 -->
+                <Menu text="视图">
+                    <CheckMenuItem text="显示状态栏" selected="true" onAction="#handleToggleStatusBar"/>
+                    <CheckMenuItem text="显示侧边栏" selected="true" onAction="#handleToggleSidebar"/>
+                    <SeparatorMenuItem/>
+                    <RadioMenuItem text="紧凑视图" toggleGroup="$viewModeGroup"/>
+                    <RadioMenuItem text="详细视图" toggleGroup="$viewModeGroup" selected="true"/>
+                    <RadioMenuItem text="图标视图" toggleGroup="$viewModeGroup"/>
+                </Menu>
+
+                <!-- 帮助菜单 -->
+                <Menu text="帮助">
+                    <MenuItem text="用户手册" onAction="#handleOpenManual"/>
+                    <MenuItem text="视频教程" onAction="#handleOpenTutorial"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="检查更新" onAction="#handleCheckUpdate"/>
+                    <SeparatorMenuItem/>
+                    <MenuItem text="关于" onAction="#handleShowAbout"/>
+                </Menu>
+            </MenuBar>
+
+            <!-- 工具栏 -->
+            <ToolBar VBox.vgrow="NEVER" style="-fx-padding: 5;">
+                <Button text="开始监控" onAction="#handleStartMonitoring" styleClass="primary-button">
+                    <graphic>
+                        <ImageView fitWidth="16" fitHeight="16">
+                            <Image url="@/image/icons/begin.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="停止监控" onAction="#handleStopMonitoring">
+                    <graphic>
+                        <ImageView fitWidth="16" fitHeight="16">
+                            <Image url="@/image/icons/stop.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Separator orientation="VERTICAL"/>
+
+                <Button text="新建规则" onAction="#handleNewRule" styleClass="success-button">
+                    <graphic>
+                        <ImageView fitWidth="16" fitHeight="16">
+                            <Image url="@/image/icons/add.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="编辑规则" onAction="#handleEditRule">
+                    <graphic>
+                        <ImageView fitWidth="16" fitHeight="16">
+                            <Image url="@/image/icons/edit.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="删除规则" onAction="#handleDeleteRule">
+                    <graphic>
+                        <ImageView fitWidth="16" fitHeight="16">
+                            <Image url="@/image/icons/delete.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Separator orientation="VERTICAL"/>
+
+                <Button text="智能搜索" onAction="#handleOpenSearch" styleClass="info-button">
+                    <graphic>
+                        <ImageView fitWidth="16" fitHeight="16">
+                            <Image url="@/image/icons/search.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button text="查看日志" onAction="#handleOpenLogs">
+                    <graphic>
+                        <ImageView fitWidth="16" fitHeight="16">
+                            <Image url="@/image/icons/log.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </ToolBar>
+        </VBox>
+    </top>
+
+    <!-- ========== 左侧区域：导航栏 ========== -->
+    <left>
+        <VBox prefWidth="220" maxWidth="300" spacing="10" style="-fx-padding: 10;">
+            <!-- 监控状态卡片 -->
+            <VBox styleClass="card" spacing="5">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="📁 监控状态" style="-fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="monitorStatusLabel" text="已停止" styleClass="status-label"/>
+                </HBox>
+
+                <VBox spacing="5" style="-fx-padding: 5 0 0 0;">
+                    <HBox>
+                        <Label text="监控文件夹:"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="monitorFolderCountLabel" text="0"/>
+                    </HBox>
+                    <HBox>
+                        <Label text="活动规则:"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="activeRuleCountLabel" text="0"/>
+                    </HBox>
+                    <HBox>
+                        <Label text="已整理文件:"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="organizedFileCountLabel" text="0"/>
+                    </HBox>
+                </VBox>
+
+                <Button text="管理监控文件夹" onAction="#handleManageMonitorFolders"
+                        style="-fx-max-width: infinity; -fx-margin-top: 5;"/>
+            </VBox>
+
+            <!-- 快速操作卡片 -->
+            <VBox styleClass="card" spacing="10">
+                <Label text="⚡ 快速操作" style="-fx-font-weight: bold;"/>
+
+                <VBox spacing="5">
+                    <Button text="📂 整理桌面" onAction="#handleOrganizeDesktop"
+                            style="-fx-max-width: infinity;" styleClass="secondary-button"/>
+                    <Button text="📥 整理下载文件夹" onAction="#handleOrganizeDownloads"
+                            style="-fx-max-width: infinity;" styleClass="secondary-button"/>
+                    <Button text="🔍 智能搜索文件" onAction="#handleSmartSearch"
+                            style="-fx-max-width: infinity;" styleClass="secondary-button"/>
+                    <Button text="🏷️ 批量管理标签" onAction="#handleManageTags"
+                            style="-fx-max-width: infinity;" styleClass="secondary-button"/>
+                </VBox>
+            </VBox>
+
+            <!-- 标签云卡片 -->
+            <VBox styleClass="card" spacing="5">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="🏷️ 热门标签" style="-fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="管理" onAction="#handleOpenTagManager"
+                            style="-fx-font-size: 10; -fx-padding: 2 5;"/>
+                </HBox>
+
+                <FlowPane fx:id="tagCloudPane" hgap="5" vgap="5"
+                          style="-fx-padding: 5;" prefHeight="150"/>
+            </VBox>
+
+            <!-- 智能推荐卡片 -->
+            <VBox styleClass="card" spacing="5">
+                <Label text="🤖 AI推荐助手" style="-fx-font-weight: bold;"/>
+
+                <VBox spacing="5" style="-fx-padding: 5 0;">
+                    <Label text="开启AI智能推荐，让文件整理更智能"
+                           style="-fx-font-size: 11; -fx-text-fill: #666;"/>
+
+                    <HBox>
+                        <ToggleButton fx:id="aiRecommendationToggle" text="开启推荐"
+                                      onAction="#handleToggleAIRecommendation"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="设置" onAction="#handleAISettings"
+                                style="-fx-font-size: 10; -fx-padding: 2 5;"/>
+                    </HBox>
+
+                    <ProgressBar fx:id="aiAccuracyProgress" prefWidth="200"
+                                 style="-fx-margin-top: 5;" progress="0.75"/>
+                    <Label text="推荐准确率: 75%" style="-fx-font-size: 10;"/>
+                </VBox>
+            </VBox>
+        </VBox>
+    </left>
+
+    <!-- ========== 中间区域：主要内容 ========== -->
+    <center>
+        <TabPane fx:id="mainTabPane" tabClosingPolicy="UNAVAILABLE">
+            <!-- 仪表板标签页 -->
+            <Tab text="📊 仪表板">
+                <ScrollPane fitToWidth="true">
+                    <VBox spacing="20" style="-fx-padding: 20;">
+                        <!-- 欢迎横幅 -->
+                        <HBox styleClass="welcome-banner" alignment="CENTER_LEFT"
+                              style="-fx-padding: 20; -fx-background-radius: 10;">
+                            <VBox>
+                                <Label text="智能文件管家" style="-fx-font-size: 24; -fx-font-weight: bold;"/>
+                                <Label text="让文件管理变得简单而智能"
+                                       style="-fx-font-size: 14; -fx-text-fill: #666;"/>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button text="开始使用指南" styleClass="primary-button"
+                                    onAction="#handleGetStarted"/>
+                        </HBox>
+
+                        <!-- 状态卡片网格 -->
+                        <GridPane hgap="15" vgap="15">
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="25"/>
+                                <ColumnConstraints percentWidth="25"/>
+                                <ColumnConstraints percentWidth="25"/>
+                                <ColumnConstraints percentWidth="25"/>
+                            </columnConstraints>
+
+                            <!-- 监控状态卡片 -->
+                            <VBox styleClass="stat-card" GridPane.columnIndex="0">
+                                <Label text="📁" style="-fx-font-size: 24;"/>
+                                <Label fx:id="monitoredFoldersLabel" text="3"
+                                       style="-fx-font-size: 28; -fx-font-weight: bold;"/>
+                                <Label text="监控文件夹" style="-fx-text-fill: #666;"/>
+                            </VBox>
+
+                            <!-- 规则状态卡片 -->
+                            <VBox styleClass="stat-card" GridPane.columnIndex="1">
+                                <Label text="⚙️" style="-fx-font-size: 24;"/>
+                                <Label fx:id="totalRulesLabel" text="12"
+                                       style="-fx-font-size: 28; -fx-font-weight: bold;"/>
+                                <Label text="活动规则" style="-fx-text-fill: #666;"/>
+                            </VBox>
+
+                            <!-- 文件统计卡片 -->
+                            <VBox styleClass="stat-card" GridPane.columnIndex="2">
+                                <Label text="📄" style="-fx-font-size: 24;"/>
+                                <Label fx:id="totalFilesLabel" text="1,245"
+                                       style="-fx-font-size: 28; -fx-font-weight: bold;"/>
+                                <Label text="已整理文件" style="-fx-text-fill: #666;"/>
+                            </VBox>
+
+                            <!-- 节省空间卡片 -->
+                            <VBox styleClass="stat-card" GridPane.columnIndex="3">
+                                <Label text="💾" style="-fx-font-size: 24;"/>
+                                <Label fx:id="spaceSavedLabel" text="2.4 GB"
+                                       style="-fx-font-size: 28; -fx-font-weight: bold;"/>
+                                <Label text="节省空间" style="-fx-text-fill: #666;"/>
+                            </VBox>
+                        </GridPane>
+
+                        <!-- 最近活动 -->
+                        <VBox spacing="10">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="📋 最近活动" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button text="查看全部" onAction="#handleViewAllActivities"
+                                        style="-fx-font-size: 12;"/>
+                            </HBox>
+
+                            <TableView fx:id="recentActivitiesTable" prefHeight="200">
+                                <columns>
+                                    <TableColumn text="时间" prefWidth="120">
+                                        <cellValueFactory>
+                                            <PropertyValueFactory property="time"/>
+                                        </cellValueFactory>
+                                    </TableColumn>
+                                    <TableColumn text="操作" prefWidth="100">
+                                        <cellValueFactory>
+                                            <PropertyValueFactory property="operation"/>
+                                        </cellValueFactory>
+                                    </TableColumn>
+                                    <TableColumn text="文件" prefWidth="250">
+                                        <cellValueFactory>
+                                            <PropertyValueFactory property="fileName"/>
+                                        </cellValueFactory>
+                                    </TableColumn>
+                                    <TableColumn text="状态" prefWidth="80">
+                                        <cellValueFactory>
+                                            <PropertyValueFactory property="status"/>
+                                        </cellValueFactory>
+                                    </TableColumn>
+                                </columns>
+                            </TableView>
+                        </VBox>
+
+                        <!-- 快速开始 -->
+                        <VBox spacing="10">
+                            <Label text="🚀 快速开始" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+
+                            <GridPane hgap="10" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="50"/>
+                                    <ColumnConstraints percentWidth="50"/>
+                                </columnConstraints>
+
+                                <VBox styleClass="quick-start-card" spacing="10">
+                                    <Label text="📂 添加监控文件夹"
+                                           style="-fx-font-weight: bold; -fx-font-size: 14;"/>
+                                    <Label text="选择需要自动整理的文件夹"
+                                           style="-fx-text-fill: #666; -fx-font-size: 12;"/>
+                                    <Button text="添加文件夹" onAction="#handleAddMonitorFolder"
+                                            style="-fx-max-width: infinity;" styleClass="primary-button"/>
+                                </VBox>
+
+                                <VBox styleClass="quick-start-card" spacing="10">
+                                    <Label text="⚙️ 创建整理规则"
+                                           style="-fx-font-weight: bold; -fx-font-size: 14;"/>
+                                    <Label text="定义文件如何自动分类和移动"
+                                           style="-fx-text-fill: #666; -fx-font-size: 12;"/>
+                                    <Button text="新建规则" onAction="#handleNewRule"
+                                            style="-fx-max-width: infinity;" styleClass="primary-button"/>
+                                </VBox>
+                            </GridPane>
+                        </VBox>
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+
+            <!-- 规则管理标签页 -->
+            <Tab text="⚙️ 规则管理">
+                <VBox spacing="10" style="-fx-padding: 15;">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="文件整理规则" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <TextField fx:id="ruleSearchField" promptText="搜索规则..." prefWidth="200"/>
+                        <Button text="新建规则" onAction="#handleNewRule" styleClass="primary-button"/>
+                        <Button text="导入规则" onAction="#handleImportRule"/>
+                        <Button text="导出规则" onAction="#handleExportRule"/>
+                    </HBox>
+
+                    <TableView fx:id="rulesTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn text="启用" prefWidth="50">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="enabled"/>
+                                </cellValueFactory>
+                            </TableColumn>
+                            <TableColumn text="规则名称" prefWidth="150">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="name"/>
+                                </cellValueFactory>
+                            </TableColumn>
+                            <TableColumn text="条件" prefWidth="200">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="condition"/>
+                                </cellValueFactory>
+                            </TableColumn>
+                            <TableColumn text="目标文件夹" prefWidth="250">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="targetPath"/>
+                                </cellValueFactory>
+                            </TableColumn>
+                            <TableColumn text="优先级" prefWidth="60">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="priority"/>
+                                </cellValueFactory>
+                            </TableColumn>
+                            <TableColumn text="操作" prefWidth="100">
+                                <cellValueFactory>
+                                    <PropertyValueFactory property="actions"/>
+                                </cellValueFactory>
+                            </TableColumn>
+                        </columns>
+                    </TableView>
+
+                    <HBox spacing="10" alignment="CENTER_RIGHT">
+                        <Label text="共" fx:id="totalRulesCountLabel" />
+                        <Label text="个规则"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <!-- 文件监控标签页 -->
+            <Tab text="👁️ 文件监控">
+                <VBox spacing="10" style="-fx-padding: 15;">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="实时文件监控" style="-fx-font-size: 18; -fx-font-weight: bold;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <ToggleButton fx:id="monitorToggleButton" text="开始监控"
+                                      onAction="#handleToggleMonitoring"/>
+                        <Button text="添加文件夹" onAction="#handleAddMonitorFolder"/>
+                        <Button text="清空列表" onAction="#handleClearMonitorList"/>
+                    </HBox>
+
+                    <HBox spacing="10">
+                        <VBox spacing="5" prefWidth="300">
+                            <Label text="监控文件夹列表" style="-fx-font-weight: bold;"/>
+                            <ListView fx:id="monitorFoldersList" VBox.vgrow="ALWAYS"/>
+                            <HBox spacing="5">
+                                <Button text="添加" onAction="#handleAddMonitorFolder"
+                                        style="-fx-max-width: infinity;" HBox.hgrow="ALWAYS"/>
+                                <Button text="移除" onAction="#handleRemoveMonitorFolder"
+                                        style="-fx-max-width: infinity;" HBox.hgrow="ALWAYS"/>
+                            </HBox>
+                        </VBox>
+
+                        <VBox spacing="5" VBox.vgrow="ALWAYS">
+                            <Label text="最近文件活动" style="-fx-font-weight: bold;"/>
+                            <TableView fx:id="fileActivitiesTable" VBox.vgrow="ALWAYS">
+                                <columns>
+                                    <TableColumn text="时间" prefWidth="120"/>
+                                    <TableColumn text="事件" prefWidth="100"/>
+                                    <TableColumn text="文件" prefWidth="250"/>
+                                    <TableColumn text="操作" prefWidth="100"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <!-- 智能搜索标签页 -->
+            <Tab text="🔍 智能搜索">
+                <VBox spacing="15" style="-fx-padding: 20;">
+                    <!-- 搜索框 -->
+                    <VBox spacing="10" styleClass="search-box">
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <TextField fx:id="searchInput" promptText="输入关键词、标签或自然语言搜索..."
+                                       style="-fx-pref-width: 400;"/>
+                            <Button text="搜索" onAction="#handleSearch" styleClass="primary-button"/>
+                            <Button text="高级搜索" onAction="#handleAdvancedSearch"/>
+                            <Button text="保存搜索" onAction="#handleSaveSearch"/>
+                        </HBox>
+
+                        <HBox spacing="20">
+                            <VBox spacing="5">
+                                <Label text="搜索类型:"/>
+<!--                                <ToggleGroup fx:id="searchTypeGroup"/>-->
+                                <HBox spacing="10">
+                                    <RadioButton text="全部" toggleGroup="$searchTypeGroup" selected="true"/>
+                                    <RadioButton text="标签" toggleGroup="$searchTypeGroup"/>
+                                    <RadioButton text="文件名" toggleGroup="$searchTypeGroup"/>
+                                    <RadioButton text="内容" toggleGroup="$searchTypeGroup"/>
+                                </HBox>
+                            </VBox>
+
+                            <VBox spacing="5">
+                                <Label text="时间范围:"/>
+                                <ComboBox fx:id="timeRangeCombo" prefWidth="150"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                    <!-- 搜索结果 -->
+                    <VBox spacing="10" VBox.vgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="搜索结果" style="-fx-font-size: 16; -fx-font-weight: bold;"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="searchResultCountLabel" text="找到 0 个文件"/>
+                        </HBox>
+
+                        <TableView fx:id="searchResultsTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn text="文件名" prefWidth="250"/>
+                                <TableColumn text="路径" prefWidth="300"/>
+                                <TableColumn text="大小" prefWidth="80"/>
+                                <TableColumn text="修改时间" prefWidth="120"/>
+                                <TableColumn text="标签" prefWidth="150"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+                </VBox>
+            </Tab>
+        </TabPane>
+    </center>
+
+    <!-- ========== 右侧区域：详情面板 ========== -->
+    <right>
+        <VBox prefWidth="280" maxWidth="350" spacing="15" style="-fx-padding: 15;">
+            <!-- 文件详情卡片 -->
+            <VBox styleClass="card" spacing="10">
+                <Label text="📄 文件详情" style="-fx-font-weight: bold;"/>
+
+                <VBox spacing="5" fx:id="fileDetailsPane" visible="false">
+                    <HBox>
+                        <Label text="名称:" style="-fx-font-weight: bold; -fx-min-width: 60;"/>
+                        <Label fx:id="detailFileName" style="-fx-wrap-text: true;"/>
+                    </HBox>
+                    <HBox>
+                        <Label text="路径:" style="-fx-font-weight: bold; -fx-min-width: 60;"/>
+                        <Label fx:id="detailFilePath" style="-fx-wrap-text: true;"/>
+                    </HBox>
+                    <HBox>
+                        <Label text="大小:" style="-fx-font-weight: bold; -fx-min-width: 60;"/>
+                        <Label fx:id="detailFileSize"/>
+                    </HBox>
+                    <HBox>
+                        <Label text="修改:" style="-fx-font-weight: bold; -fx-min-width: 60;"/>
+                        <Label fx:id="detailFileModified"/>
+                    </HBox>
+                    <HBox>
+                        <Label text="类型:" style="-fx-font-weight: bold; -fx-min-width: 60;"/>
+                        <Label fx:id="detailFileType"/>
+                    </HBox>
+
+                    <Separator/>
+
+                    <Label text="标签:" style="-fx-font-weight: bold;"/>
+                    <FlowPane fx:id="detailFileTags" hgap="5" vgap="5"/>
+
+                    <HBox spacing="5">
+                        <Button text="打开文件" onAction="#handleOpenFile"
+                                style="-fx-max-width: infinity;" HBox.hgrow="ALWAYS"/>
+                        <Button text="打开位置" onAction="#handleOpenFileLocation"
+                                style="-fx-max-width: infinity;" HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                </VBox>
+
+                <Label fx:id="noFileSelectedLabel" text="选择文件查看详情"
+                       style="-fx-text-fill: #999; -fx-font-style: italic;"/>
+            </VBox>
+
+            <!-- 智能操作卡片 -->
+            <VBox styleClass="card" spacing="10">
+                <Label text="🤖 智能操作" style="-fx-font-weight: bold;"/>
+
+                <VBox spacing="5">
+                    <Button text="AI智能分类" onAction="#handleAIClassify"
+                            style="-fx-max-width: infinity;" styleClass="secondary-button"/>
+                    <Label text="让AI分析文件并推荐分类" style="-fx-font-size: 11; -fx-text-fill: #666;"/>
+
+                    <Separator/>
+
+                    <Button text="智能重命名" onAction="#handleSmartRenameFile"
+                            style="-fx-max-width: infinity;" styleClass="secondary-button"/>
+                    <Label text="基于规则批量重命名" style="-fx-font-size: 11; -fx-text-fill: #666;"/>
+
+                    <Separator/>
+
+                    <Button text="生成文件报告" onAction="#handleGenerateFileReport"
+                            style="-fx-max-width: infinity;" styleClass="secondary-button"/>
+                    <Label text="创建文件统计和分析报告" style="-fx-font-size: 11; -fx-text-fill: #666;"/>
+                </VBox>
+            </VBox>
+
+            <!-- 系统状态卡片 -->
+            <VBox styleClass="card" spacing="10">
+                <Label text="📈 系统状态" style="-fx-font-weight: bold;"/>
+
+                <VBox spacing="5">
+                    <ProgressBar fx:id="cpuUsageBar" progress="0.3" prefWidth="Infinity"/>
+                    <HBox>
+                        <Label text="CPU使用:"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="cpuUsageLabel" text="30%"/>
+                    </HBox>
+
+                    <ProgressBar fx:id="memoryUsageBar" progress="0.45" prefWidth="Infinity"/>
+                    <HBox>
+                        <Label text="内存使用:"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="memoryUsageLabel" text="45%"/>
+                    </HBox>
+
+                    <ProgressBar fx:id="diskUsageBar" progress="0.65" prefWidth="Infinity"/>
+                    <HBox>
+                        <Label text="磁盘使用:"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="diskUsageLabel" text="65%"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <!-- 快速提示卡片 -->
+            <VBox styleClass="card" spacing="10">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="💡 快速提示" style="-fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="下一个" onAction="#handleNextTip"
+                            style="-fx-font-size: 10; -fx-padding: 2 5;"/>
+                </HBox>
+
+                <VBox spacing="5">
+                    <Label fx:id="tipTitle" text="智能标签系统"
+                           style="-fx-font-weight: bold; -fx-font-size: 13;"/>
+                    <Label fx:id="tipContent"
+                           text="使用AI自动为文件生成标签，或手动添加自定义标签。标签可以帮助您更快速地搜索和分类文件。"
+                           style="-fx-text-fill: #666; -fx-font-size: 12; -fx-wrap-text: true;"/>
+                </VBox>
+            </VBox>
+        </VBox>
+    </right>
+
+    <!-- ========== 底部区域：状态栏 ========== -->
+    <bottom>
+        <HBox styleClass="status-bar" spacing="10" alignment="CENTER_LEFT"
+              style="-fx-padding: 5 15;">
+            <Label fx:id="statusMessage" text="就绪"/>
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <HBox spacing="10">
+                <Label text="监控:"/>
+                <Label fx:id="statusMonitorStatus" text="已停止" styleClass="status-indicator"/>
+
+                <Separator orientation="VERTICAL"/>
+
+                <Label text="文件:"/>
+                <Label fx:id="statusFileCount" text="0"/>
+
+                <Separator orientation="VERTICAL"/>
+
+                <ProgressIndicator fx:id="statusProgressIndicator" progress="-1"
+                                   visible="false" prefWidth="16" prefHeight="16"/>
+                <Label fx:id="statusOperation" text=""/>
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Label text="版本:"/>
+            <Label fx:id="versionLabel" text="v1.0.0"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>
