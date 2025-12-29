@@ -1,5 +1,6 @@
 package com.smartfilemanager;
 
+import com.smartfilemanager.service.core.FileMonitorService;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -10,14 +11,20 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import com.smartfilemanager.controller.MainController;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
+@SpringBootApplication
 public class SmartFileManagerApp extends Application {
 
     private Stage primaryStage;
+    private static ConfigurableApplicationContext applicationContext;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
         this.primaryStage = primaryStage;
+//        MainController controller = new MainController();
 
         try {
             // 加载主界面FXML
@@ -28,7 +35,13 @@ public class SmartFileManagerApp extends Application {
 
             // 获取控制器并传递主舞台引用
             MainController controller = loader.getController();
-            controller.initialize(primaryStage);
+//            controller.initialize(primaryStage);
+            // 手动注入 Spring 管理的依赖
+            if (applicationContext != null) {
+                // 从 Spring 容器获取 FileMonitorService
+                FileMonitorService fileMonitorService = applicationContext.getBean(FileMonitorService.class);
+                controller.setFileMonitorService(fileMonitorService);
+            }
 
             // 创建场景
             Scene scene = new Scene(root, 1200, 800);
@@ -95,10 +108,11 @@ public class SmartFileManagerApp extends Application {
 
     public static void main(String[] args) {
         // 设置JavaFX线程异常处理器
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            System.err.println("未捕获的异常: " + throwable.getMessage());
-            throwable.printStackTrace();
-        });
+//        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+//            System.err.println("未捕获的异常: " + throwable.getMessage());
+//            throwable.printStackTrace();
+//        });
+        applicationContext = SpringApplication.run(SmartFileManagerApp.class, args);
 
         // 启动JavaFX应用
         launch(args);

@@ -1,15 +1,22 @@
 package com.smartfilemanager.controller;
 
+import com.smartfilemanager.service.core.FileMonitorService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+@Controller
 public class MainController implements Initializable {
+//主界面控制器
 
     // 顶部组件
     @FXML private MenuBar menuBar;
@@ -80,6 +87,8 @@ public class MainController implements Initializable {
     // 数据模型
     private Stage primaryStage;
 
+    FileMonitorService fileMonitorService;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // 初始化UI组件
@@ -146,8 +155,12 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void handleStartMonitoring() {
+    private void handleStartMonitoring() throws IOException {
         // 开始监控
+        monitorToggleButton.setSelected(true);
+        System.out.println("开始监控");
+        fileMonitorService.startMonitoring();
+
     }
 
     @FXML
@@ -402,8 +415,14 @@ public class MainController implements Initializable {
         // 加载系统状态
     }
 
-    public void handleToggleMonitoring(ActionEvent actionEvent) {
+    public void handleToggleMonitoring(ActionEvent actionEvent) throws IOException {
         //开始监控
+        //文件监控页面中的开始监控
+        handleStartMonitoring();
+    }
+
+    public void setFileMonitorService(FileMonitorService fileMonitorService) {
+        this.fileMonitorService = fileMonitorService;
     }
 
     // ========== 数据模型类 ==========
