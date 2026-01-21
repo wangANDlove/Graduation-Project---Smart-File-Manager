@@ -7,7 +7,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
@@ -21,6 +20,14 @@ public class MainController implements Initializable {
     // 顶部组件
     @FXML private MenuBar menuBar;
     @FXML private ToolBar toolBar;
+    //顶部区域：菜单栏：监控菜单
+    @FXML private MenuItem startMonitorMenuItem;
+    @FXML private MenuItem stopMonitorMenuItem;
+
+    @FXML private Button startMonitorToolbarButton;
+    @FXML private Button stopMonitorToolbarButton;
+
+
 
     // 左侧导航组件
     @FXML private Label monitorStatusLabel;
@@ -89,12 +96,19 @@ public class MainController implements Initializable {
 
     FileMonitorService fileMonitorService;
 
+
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // 初始化UI组件
         initializeComponents();
         loadInitialData();
         setupEventHandlers();
+
+        initializeMonitorStatus();
+
+
+
     }
 
     public void initialize(Stage primaryStage) {
@@ -122,6 +136,23 @@ public class MainController implements Initializable {
 
     private void setupEventHandlers() {
         // 设置事件处理器
+    }
+    private void initializeMonitorStatus() {
+        // 设置初始状态
+        if (startMonitorMenuItem != null) {
+            startMonitorMenuItem.setDisable(false);
+        }
+        if (stopMonitorMenuItem != null) {
+            stopMonitorMenuItem.setDisable(true);
+        }
+        if(startMonitorToolbarButton != null){
+            startMonitorToolbarButton.setDisable(false);
+        }
+        if(stopMonitorToolbarButton != null){
+            stopMonitorToolbarButton.setDisable(true);
+        }
+        monitorStatusLabel.getStyleClass().removeAll("stopped", "running", "paused");
+        monitorStatusLabel.getStyleClass().add("stopped");
     }
 
     // ========== 菜单事件处理方法 ==========
@@ -158,6 +189,7 @@ public class MainController implements Initializable {
     private void handleStartMonitoring() throws IOException {
         // 开始监控
         monitorToggleButton.setSelected(true);
+        updateMonitorButtonStatus( true);
         System.out.println("开始监控");
         fileMonitorService.startMonitoring();
 
@@ -166,6 +198,42 @@ public class MainController implements Initializable {
     @FXML
     private void handleStopMonitoring() {
         // 停止监控
+        monitorToggleButton.setSelected(false);
+        updateMonitorButtonStatus(false);
+        System.out.println("停止监控");
+        fileMonitorService.stopMonitoring();
+    }
+    private void updateMonitorButtonStatus(boolean isMonitoring) {
+        // 更新菜单项状态
+        if (startMonitorMenuItem != null) {
+            startMonitorMenuItem.setDisable(isMonitoring);
+        }
+        if (stopMonitorMenuItem != null) {
+            stopMonitorMenuItem.setDisable(!isMonitoring);
+        }
+
+        // 更新工具栏按钮状态
+        if (startMonitorToolbarButton != null) {
+            startMonitorToolbarButton.setDisable(isMonitoring);
+        }
+        if (stopMonitorToolbarButton != null) {
+            stopMonitorToolbarButton.setDisable(!isMonitoring);
+        }
+
+        if(isMonitoring){
+            //修改底部状态栏文本内容
+            statusMonitorStatus.setText("正在监控");
+            monitorStatusLabel.setText("正在监控");
+            monitorStatusLabel.getStyleClass().removeAll("stopped", "running", "paused");
+            monitorStatusLabel.getStyleClass().add("running");
+
+
+        }else{
+            statusMonitorStatus.setText("已停止");
+            monitorStatusLabel.setText("已停止");
+            monitorStatusLabel.getStyleClass().removeAll("stopped", "running", "paused");
+            monitorStatusLabel.getStyleClass().add("stopped");
+        }
     }
 
     @FXML

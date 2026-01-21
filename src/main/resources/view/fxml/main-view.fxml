@@ -51,12 +51,15 @@
 
                 <!-- 监控菜单 -->
                 <Menu text="监控">
-                    <MenuItem text="开始监控" onAction="#handleStartMonitoring">
+                    <MenuItem text="开始监控" onAction="#handleStartMonitoring" fx:id="startMonitorMenuItem">
 <!--                        <accelerator>-->
 <!--                            <KeyCodeCombination code="F5"/>-->
 <!--                        </accelerator>-->
                     </MenuItem>
-                    <MenuItem text="停止监控" onAction="#handleStopMonitoring"/>
+                    <MenuItem text="停止监控" onAction="#handleStopMonitoring"
+                              fx:id="stopMonitorMenuItem" disable="true"
+
+                    />
                     <MenuItem text="添加监控文件夹..." onAction="#handleAddMonitorFolder"/>
                     <SeparatorMenuItem/>
                     <MenuItem text="手动整理" onAction="#handleManualOrganize"/>
@@ -95,14 +98,16 @@
 
             <!-- 工具栏 -->
             <ToolBar VBox.vgrow="NEVER" style="-fx-padding: 5;">
-                <Button text="开始监控" onAction="#handleStartMonitoring" styleClass="primary-button">
+                <Button text="开始监控" onAction="#handleStartMonitoring" styleClass="primary-button"
+                        fx:id="startMonitorToolbarButton">
                     <graphic>
                         <ImageView fitWidth="16" fitHeight="16">
                             <Image url="@/image/icons/begin.png"/>
                         </ImageView>
                     </graphic>
                 </Button>
-                <Button text="停止监控" onAction="#handleStopMonitoring">
+                <Button text="停止监控" onAction="#handleStopMonitoring"
+                        fx:id="stopMonitorToolbarButton">
                     <graphic>
                         <ImageView fitWidth="16" fitHeight="16">
                             <Image url="@/image/icons/stop.png"/>
@@ -160,7 +165,11 @@
                 <HBox alignment="CENTER_LEFT">
                     <Label text="📁 监控状态" style="-fx-font-weight: bold;"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Label fx:id="monitorStatusLabel" text="已停止" styleClass="status-label"/>
+                    <!-- 在Label元素中添加stopped状态类 -->
+                    <Label fx:id="monitorStatusLabel" text="已停止" styleClass="status-label" />
+
+
+<!--                    <Label fx:id="monitorStatusLabel" text="已停止" styleClass="status-label stopped"/>-->
                 </HBox>
 
                 <VBox spacing="5" style="-fx-padding: 5 0 0 0;">

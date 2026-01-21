@@ -133,15 +133,15 @@
     -fx-text-fill: white;
 }
 
-.status-label:stopped {
+.status-label.stopped {
     -fx-background-color: #F44336;
 }
 
-.status-label:running {
+.status-label.running {
     -fx-background-color: #4CAF50;
 }
 
-.status-label:paused {
+.status-label.paused {
     -fx-background-color: #FF9800;
 }
 
@@ -337,3 +337,17 @@
 .toggle-button:selected:hover {
     -fx-background-color: #1976D2;
 }
+
+/* 禁用状态的菜单项样式 */
+.disabled-menu-item {
+    -fx-text-fill: #999 !important;
+    -fx-opacity: 0.6 !important;
+    -fx-background-color: #f5f5f5 !important;
+    -fx-border-color: #ddd !important;
+}
+
+/*!* 悬停时禁用菜单项的样式 *!*/
+/*.disabled-menu-item:hover {*/
+/*    -fx-background-color: #f5f5f5 !important;*/
+/*    -fx-text-fill: #999 !important;*/
+/*}*/
